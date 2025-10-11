@@ -546,6 +546,8 @@ const Game = () => {
           <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-lg">
             <div className="text-white text-sm">🖱️ Move with mouse</div>
             <div className="text-white text-sm">⚡ Space/Click to boost</div>
+            <div className="text-green-400 text-sm">🌱 Eat grass to grow!</div>
+            <div className="text-yellow-400 text-sm">💪 Be 20% bigger to eat other cows</div>
           </div>
           
           {/* Leaderboard */}
