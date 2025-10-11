@@ -242,13 +242,12 @@ const Game = () => {
     player.move(worldMouseX, worldMouseY);
     
     // Update camera
-    const head = player.getHead();
-    game.camera.x = head.x;
-    game.camera.y = head.y;
+    game.camera.x = player.x;
+    game.camera.y = player.y;
     
-    // Check food collision
-    game.food = game.food.filter(food => {
-      if (player.checkCollision(food.x, food.y, food.radius)) {
+    // Check grass collision for player
+    game.grass = game.grass.filter(grass => {
+      if (player.checkCollision(grass.x, grass.y, grass.radius)) {
         player.grow(1);
         setScore(prev => prev + 1);
         return false;
@@ -256,9 +255,9 @@ const Game = () => {
       return true;
     });
     
-    // Spawn new food if needed
-    while (game.food.length < FOOD_COUNT) {
-      game.food.push(new Food(
+    // Spawn new grass if needed
+    while (game.grass.length < GRASS_COUNT) {
+      game.grass.push(new Grass(
         Math.random() * CANVAS_WIDTH,
         Math.random() * CANVAS_HEIGHT
       ));
@@ -267,10 +266,10 @@ const Game = () => {
     // Update bots
     updateBots();
     
-    // Check bot food collision
+    // Check bot grass collision
     game.bots.forEach(bot => {
-      game.food = game.food.filter(food => {
-        if (bot.checkCollision(food.x, food.y, food.radius)) {
+      game.grass = game.grass.filter(grass => {
+        if (bot.checkCollision(grass.x, grass.y, grass.radius)) {
           bot.grow(1);
           return false;
         }
@@ -278,33 +277,47 @@ const Game = () => {
       });
     });
     
-    // Check collisions with other cows
+    // Check collisions with other cows (eating mechanic)
     let playerDied = false;
     
-    // Player collision with bots
-    game.bots.forEach(bot => {
-      if (player.checkCollisionWithCow(bot)) {
-        playerDied = true;
-      }
-    });
-    
-    // Bot collisions
+    // Player eating bots
     game.bots = game.bots.filter(bot => {
-      if (bot.checkCollisionWithCow(player)) {
-        spawnFood(bot.getHead().x, bot.getHead().y, bot.mass);
-        player.grow(Math.floor(bot.mass / 2));
-        return false;
-      }
-      
-      for (let otherBot of game.bots) {
-        if (bot !== otherBot && bot.checkCollisionWithCow(otherBot)) {
-          spawnFood(bot.getHead().x, bot.getHead().y, bot.mass);
+      if (player.checkCollisionWithCow(bot)) {
+        if (player.canEat(bot)) {
+          // Player eats bot
+          spawnGrass(bot.x, bot.y, Math.floor(bot.mass / 2));
+          player.grow(Math.floor(bot.mass / 3));
+          setScore(prev => prev + Math.floor(bot.mass / 2));
           return false;
+        } else if (bot.canEat(player)) {
+          // Bot eats player
+          playerDied = true;
         }
       }
-      
       return true;
     });
+    
+    // Bot vs bot collisions
+    for (let i = game.bots.length - 1; i >= 0; i--) {
+      const bot1 = game.bots[i];
+      for (let j = i - 1; j >= 0; j--) {
+        const bot2 = game.bots[j];
+        if (bot1.checkCollisionWithCow(bot2)) {
+          if (bot1.canEat(bot2)) {
+            spawnGrass(bot2.x, bot2.y, Math.floor(bot2.mass / 2));
+            bot1.grow(Math.floor(bot2.mass / 3));
+            game.bots.splice(j, 1);
+            i--;
+            break;
+          } else if (bot2.canEat(bot1)) {
+            spawnGrass(bot1.x, bot1.y, Math.floor(bot1.mass / 2));
+            bot2.grow(Math.floor(bot1.mass / 3));
+            game.bots.splice(i, 1);
+            break;
+          }
+        }
+      }
+    }
     
     if (playerDied) {
       if (score > highScore) {
@@ -315,9 +328,9 @@ const Game = () => {
     }
     
     // Update leaderboard
-    const leaders = [{ name: player.name, score: player.mass, isPlayer: true }];
+    const leaders = [{ name: player.name, score: Math.floor(player.mass), isPlayer: true }];
     game.bots.forEach(bot => {
-      leaders.push({ name: bot.name, score: bot.mass, isPlayer: false });
+      leaders.push({ name: bot.name, score: Math.floor(bot.mass), isPlayer: false });
     });
     leaders.sort((a, b) => b.score - a.score);
     setLeaderboard(leaders.slice(0, 10));
