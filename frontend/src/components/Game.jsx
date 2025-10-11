@@ -98,7 +98,7 @@ const Game = () => {
   const gameRef = useRef({
     player: null,
     bots: [],
-    food: [],
+    grass: [],
     mouseX: 0,
     mouseY: 0,
     camera: { x: 0, y: 0 },
