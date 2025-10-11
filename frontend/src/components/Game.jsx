@@ -344,12 +344,15 @@ const Game = () => {
   const render = (ctx, width, height) => {
     const game = gameRef.current;
     
-    // Clear canvas
-    ctx.fillStyle = '#1a1a2e';
+    // Clear canvas with grass field background
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#0f380f');
+    gradient.addColorStop(1, '#1a4d1a');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
     
     // Draw grid
-    ctx.strokeStyle = '#16213e';
+    ctx.strokeStyle = 'rgba(34, 139, 34, 0.2)';
     ctx.lineWidth = 1;
     const gridSize = 50;
     const offsetX = game.camera.x % gridSize;
@@ -373,72 +376,100 @@ const Game = () => {
     ctx.save();
     ctx.translate(width / 2 - game.camera.x, height / 2 - game.camera.y);
     
-    // Draw food
-    game.food.forEach(food => {
-      ctx.fillStyle = food.color;
+    // Draw grass
+    game.grass.forEach(grass => {
+      ctx.fillStyle = grass.color;
       ctx.beginPath();
-      ctx.arc(food.x, food.y, food.radius, 0, Math.PI * 2);
+      ctx.arc(grass.x, grass.y, grass.radius, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Grass blade effect
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(grass.x, grass.y - grass.radius);
+      ctx.lineTo(grass.x, grass.y + grass.radius);
+      ctx.stroke();
     });
+    
+    // Sort cows by size (draw smaller ones first)
+    const allCows = [...game.bots, game.player].sort((a, b) => a.size - b.size);
     
     // Draw all cows
     const drawCow = (cow) => {
-      // Draw body segments
-      for (let i = cow.segments.length - 1; i >= 0; i--) {
-        const segment = cow.segments[i];
-        const radius = i === 0 ? SEGMENT_RADIUS * 1.5 : SEGMENT_RADIUS;
+      const radius = cow.getRadius();
+      
+      // Shadow
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+      ctx.beginPath();
+      ctx.ellipse(cow.x + 5, cow.y + 5, radius, radius * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Outline
+      ctx.strokeStyle = cow.isPlayer ? '#ffffff' : 'rgba(0, 0, 0, 0.5)';
+      ctx.lineWidth = cow.isPlayer ? 4 : 3;
+      ctx.beginPath();
+      ctx.arc(cow.x, cow.y, radius + 2, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // Body
+      ctx.fillStyle = cow.color;
+      ctx.beginPath();
+      ctx.arc(cow.x, cow.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Cow spots (multiple spots based on size)
+      const spotCount = Math.floor(radius / 15) + 2;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      for (let i = 0; i < spotCount; i++) {
+        const angle = (i / spotCount) * Math.PI * 2;
+        const distance = radius * 0.4;
+        const spotX = cow.x + Math.cos(angle) * distance;
+        const spotY = cow.y + Math.sin(angle) * distance;
+        const spotSize = radius * 0.15;
         
-        // Outline
-        ctx.fillStyle = cow.isPlayer ? '#ffffff' : '#000000';
         ctx.beginPath();
-        ctx.arc(segment.x, segment.y, radius + 2, 0, Math.PI * 2);
+        ctx.arc(spotX, spotY, spotSize, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Body
-        ctx.fillStyle = cow.color;
-        ctx.beginPath();
-        ctx.arc(segment.x, segment.y, radius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Cow spots (every few segments)
-        if (i % 3 === 0) {
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.beginPath();
-          ctx.arc(segment.x - 3, segment.y - 2, 3, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(segment.x + 2, segment.y + 2, 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
       }
       
-      // Draw cow head (emoji style)
-      const head = cow.getHead();
-      ctx.font = 'bold 24px Arial';
+      // Draw cow emoji/face based on size
+      const fontSize = Math.max(20, Math.min(60, radius * 0.8));
+      ctx.font = `bold ${fontSize}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🐮', head.x, head.y);
+      ctx.fillText('🐮', cow.x, cow.y);
       
-      // Draw name
-      ctx.font = 'bold 12px Arial';
+      // Draw name above cow
+      const nameSize = Math.max(10, Math.min(16, radius * 0.3));
+      ctx.font = `bold ${nameSize}px Arial`;
       ctx.fillStyle = '#ffffff';
       ctx.strokeStyle = '#000000';
       ctx.lineWidth = 3;
-      ctx.strokeText(cow.name, head.x, head.y - 25);
-      ctx.fillText(cow.name, head.x, head.y - 25);
+      ctx.strokeText(cow.name, cow.x, cow.y - radius - 10);
+      ctx.fillText(cow.name, cow.x, cow.y - radius - 10);
+      
+      // Draw size indicator
+      if (cow.isPlayer) {
+        ctx.font = 'bold 12px Arial';
+        ctx.strokeText(Math.floor(cow.mass), cow.x, cow.y + radius + 15);
+        ctx.fillText(Math.floor(cow.mass), cow.x, cow.y + radius + 15);
+      }
     };
     
-    game.bots.forEach(drawCow);
-    drawCow(game.player);
+    allCows.forEach(drawCow);
     
     ctx.restore();
     
     // Draw border warning
-    const head = game.player.getHead();
-    if (head.x < 200 || head.x > CANVAS_WIDTH - 200 || head.y < 200 || head.y > CANVAS_HEIGHT - 200) {
+    if (game.player.x < 300 || game.player.x > CANVAS_WIDTH - 300 || 
+        game.player.y < 300 || game.player.y > CANVAS_HEIGHT - 300) {
       ctx.strokeStyle = '#ff0000';
       ctx.lineWidth = 5;
       ctx.strokeRect(10, 10, width - 20, height - 20);
+      
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+      ctx.fillRect(10, 10, width - 20, height - 20);
     }
   };
 
