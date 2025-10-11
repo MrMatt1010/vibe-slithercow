@@ -80,12 +80,12 @@ class Cow {
   }
 }
 
-class Food {
+class Grass {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.radius = 6;
-    this.color = `hsl(${Math.random() * 60 + 90}, 70%, 60%)`; // Green-yellow range
+    this.radius = 4;
+    this.color = `hsl(${Math.random() * 40 + 90}, ${60 + Math.random() * 20}%, ${50 + Math.random() * 20}%)`; // Green shades
   }
 }
 
