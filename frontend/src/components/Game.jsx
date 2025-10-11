@@ -2,99 +2,81 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { PlayCircle, RotateCcw } from 'lucide-react';
 
-const CANVAS_WIDTH = 3000;
-const CANVAS_HEIGHT = 3000;
-const INITIAL_LENGTH = 10;
-const SEGMENT_RADIUS = 8;
-const FOOD_COUNT = 200;
-const BOT_COUNT = 15;
-const BASE_SPEED = 3;
-const BOOST_SPEED = 6;
+const CANVAS_WIDTH = 4000;
+const CANVAS_HEIGHT = 4000;
+const INITIAL_SIZE = 20;
+const GRASS_COUNT = 300;
+const BOT_COUNT = 20;
+const BASE_SPEED = 4;
+const BOOST_SPEED = 7;
+const MAX_SIZE = 200;
 
 class Cow {
   constructor(x, y, color, isPlayer = false, name = 'Cow') {
-    this.segments = [];
+    this.x = x;
+    this.y = y;
     this.color = color;
     this.isPlayer = isPlayer;
     this.name = name;
     this.speed = BASE_SPEED;
     this.angle = Math.random() * Math.PI * 2;
     this.isBoosting = false;
-    this.mass = INITIAL_LENGTH;
-    
-    // Initialize segments
-    for (let i = 0; i < INITIAL_LENGTH; i++) {
-      this.segments.push({
-        x: x - i * SEGMENT_RADIUS,
-        y: y
-      });
-    }
+    this.size = INITIAL_SIZE;
+    this.targetX = x;
+    this.targetY = y;
+    this.mass = 10;
   }
 
-  getHead() {
-    return this.segments[0];
+  getRadius() {
+    return this.size;
   }
 
   move(targetX, targetY) {
-    const head = this.getHead();
-    const dx = targetX - head.x;
-    const dy = targetY - head.y;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    
+    const dx = targetX - this.x;
+    const dy = targetY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    if (distance > 0) {
+    if (distance > 5) {
       this.angle = Math.atan2(dy, dx);
-    }
-    
-    const speed = this.isBoosting ? BOOST_SPEED : this.speed;
-    const newX = head.x + Math.cos(this.angle) * speed;
-    const newY = head.y + Math.sin(this.angle) * speed;
-    
-    // Add new head
-    this.segments.unshift({ x: newX, y: newY });
-    
-    // Remove tail if not growing
-    if (this.segments.length > this.mass) {
-      this.segments.pop();
+      
+      // Speed decreases as cow gets bigger
+      const speedMultiplier = Math.max(0.5, 1 - (this.size / MAX_SIZE) * 0.5);
+      const speed = (this.isBoosting ? BOOST_SPEED : this.speed) * speedMultiplier;
+      
+      this.x += Math.cos(this.angle) * Math.min(speed, distance);
+      this.y += Math.sin(this.angle) * Math.min(speed, distance);
     }
   }
 
-  grow(amount = 3) {
+  grow(amount = 1) {
     this.mass += amount;
+    this.size = Math.min(MAX_SIZE, INITIAL_SIZE + Math.sqrt(this.mass) * 2);
   }
 
   checkCollision(x, y, radius) {
-    const head = this.getHead();
-    const dx = head.x - x;
-    const dy = head.y - y;
-    return Math.sqrt(dx * dx + dy * dy) < radius + SEGMENT_RADIUS;
-  }
-
-  checkSelfCollision() {
-    const head = this.getHead();
-    for (let i = 4; i < this.segments.length; i++) {
-      const segment = this.segments[i];
-      const dx = head.x - segment.x;
-      const dy = head.y - segment.y;
-      if (Math.sqrt(dx * dx + dy * dy) < SEGMENT_RADIUS * 1.5) {
-        return true;
-      }
-    }
-    return false;
+    const dx = this.x - x;
+    const dy = this.y - y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < this.getRadius() + radius;
   }
 
   checkCollisionWithCow(otherCow) {
     if (otherCow === this) return false;
     
-    const head = this.getHead();
-    for (let i = (otherCow === this ? 4 : 0); i < otherCow.segments.length; i++) {
-      const segment = otherCow.segments[i];
-      const dx = head.x - segment.x;
-      const dy = head.y - segment.y;
-      if (Math.sqrt(dx * dx + dy * dy) < SEGMENT_RADIUS * 1.8) {
-        return true;
-      }
-    }
-    return false;
+    const dx = this.x - otherCow.x;
+    const dy = this.y - otherCow.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const minDistance = this.getRadius() + otherCow.getRadius();
+    
+    return distance < minDistance;
+  }
+
+  canEat(otherCow) {
+    // Can eat if 20% bigger
+    return this.size > otherCow.size * 1.2;
   }
 }
 
