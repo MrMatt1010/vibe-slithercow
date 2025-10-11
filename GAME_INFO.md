@@ -50,14 +50,17 @@ A hilarious twist on the classic agar.io game where you control a **growing cow*
 
 1. **Start**: Click "Start Game" on menu
 2. **Move**: Move your mouse to control your cow
-3. **Boost**: Hold Space or Click to go faster
-4. **Grow**: Eat green/yellow food pellets
-5. **Survive**: Avoid hitting other cows' bodies
-6. **Win**: Kill other cows and eat their remains to grow massive!
+3. **Boost**: Hold Space or Click to go faster (slower when bigger)
+4. **Grow**: Eat green grass pellets to increase your size
+5. **Hunt**: When you're 20% bigger than another cow, eat them!
+6. **Survive**: Avoid bigger cows or they'll eat you!
+7. **Dominate**: Become the biggest cow on the farm!
 
 ## Controls
 - 🖱️ **Mouse Movement**: Control cow direction
 - ⚡ **Space / Click**: Boost speed
+- 🌱 **Goal**: Eat grass to grow!
+- 💪 **Strategy**: Be 20% bigger to eat other cows
 
 ## Fun Facts
 - Each cow has a unique name
