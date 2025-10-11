@@ -63,10 +63,13 @@ A hilarious twist on the classic agar.io game where you control a **growing cow*
 - 💪 **Strategy**: Be 20% bigger to eat other cows
 
 ## Fun Facts
-- Each cow has a unique name
-- Cows have white spots that appear on body segments
+- Each cow has a unique name from a farm roster
+- Cows have white spots that multiply as they grow
 - The player cow has a white outline to stand out
-- When you die, your cow becomes food for others!
+- When you die, you drop grass for others to eat!
+- Bigger cows move slower - size vs speed tradeoff
+- The cow emoji face scales from tiny to massive
+- AI cows run away from bigger threats and chase grass
 
 ---
 
