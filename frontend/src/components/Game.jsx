@@ -137,12 +137,12 @@ const Game = () => {
     setGameState('playing');
   };
 
-  const spawnFood = (x, y, count) => {
+  const spawnGrass = (x, y, count) => {
     const game = gameRef.current;
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const distance = Math.random() * 100;
-      game.food.push(new Food(
+      const distance = Math.random() * 150;
+      game.grass.push(new Grass(
         x + Math.cos(angle) * distance,
         y + Math.sin(angle) * distance
       ));
