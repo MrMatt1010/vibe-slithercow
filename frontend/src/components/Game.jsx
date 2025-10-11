@@ -115,8 +115,8 @@ const Game = () => {
     
     // Create bot cows
     game.bots = [];
-    const cowNames = ['Bessie', 'Daisy', 'Buttercup', 'Clover', 'Rosie', 'Bella', 'Luna', 'Maggie', 'Molly', 'Penny', 'Ruby', 'Sadie', 'Sophie', 'Stella', 'Willow'];
-    const colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FFEB3B', '#F44336', '#3F51B5', '#8BC34A', '#FF5722', '#673AB7', '#009688', '#FFC107', '#795548', '#607D8B'];
+    const cowNames = ['Bessie', 'Daisy', 'Buttercup', 'Clover', 'Rosie', 'Bella', 'Luna', 'Maggie', 'Molly', 'Penny', 'Ruby', 'Sadie', 'Sophie', 'Stella', 'Willow', 'Mabel', 'Hazel', 'Ginger', 'Chloe', 'Abby'];
+    const colors = ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#FFEB3B', '#F44336', '#3F51B5', '#8BC34A', '#FF5722', '#673AB7', '#009688', '#FFC107', '#795548', '#607D8B', '#E91E63', '#00BCD4', '#FF6F00', '#7B1FA2', '#1976D2'];
     
     for (let i = 0; i < BOT_COUNT; i++) {
       const x = Math.random() * CANVAS_WIDTH;
@@ -124,10 +124,10 @@ const Game = () => {
       game.bots.push(new Cow(x, y, colors[i % colors.length], false, cowNames[i]));
     }
     
-    // Create food
-    game.food = [];
-    for (let i = 0; i < FOOD_COUNT; i++) {
-      game.food.push(new Food(
+    // Create grass
+    game.grass = [];
+    for (let i = 0; i < GRASS_COUNT; i++) {
+      game.grass.push(new Grass(
         Math.random() * CANVAS_WIDTH,
         Math.random() * CANVAS_HEIGHT
       ));
