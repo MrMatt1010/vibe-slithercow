@@ -41,10 +41,12 @@ A hilarious twist on the classic agar.io game where you control a **growing cow*
 - No multiplayer (single-player with AI bots)
 
 ### Game Mechanics
-- **Map Size**: 3000x3000 pixels
-- **200 Food Pellets**: Constantly respawning
+- **Map Size**: 4000x4000 pixels  
+- **300 Grass Pellets**: Constantly respawning across the field
 - **Camera Follow**: Smooth camera tracking player cow
-- **Physics**: Realistic snake-like movement with segment following
+- **Physics**: Size-based movement speed (bigger = slower)
+- **Eating Rule**: Must be 20% bigger to consume another cow
+- **Max Size**: Cows can grow up to 200 pixels in radius
 
 ## How to Play
 
