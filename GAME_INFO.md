@@ -1,23 +1,26 @@
-# 🐮 Cow.io - Slither.io Clone
+# 🐮 Cow.io - Growing Cow Game
 
 ## Game Overview
-A hilarious twist on the classic slither.io game where instead of snakes, you control a **stretched-out cow**!
+A hilarious twist on the classic agar.io game where you control a **growing cow** that eats grass and gets bigger!
 
 ## Features Implemented ✅
 
 ### Core Gameplay
 - **Player Control**: Move your cow by moving your mouse cursor
-- **Boost Feature**: Hold Space or Click to boost speed (uses mass)
-- **Growth System**: Collect food pellets to grow longer
-- **15 AI Bot Cows**: Named cows (Bessie, Daisy, Buttercup, etc.) that compete with you
-- **Collision Detection**: Hit another cow's body and you die, they drop food pellets
+- **Boost Feature**: Hold Space or Click to boost speed
+- **Growth System**: Eat grass pellets to grow bigger in size (not length!)
+- **20 AI Bot Cows**: Named cows (Bessie, Daisy, Buttercup, etc.) that compete with you
+- **Eating Mechanic**: Be 20% bigger than another cow to eat them!
+- **Size Matters**: Bigger cows move slower but are more powerful
 - **Real-time Leaderboard**: Shows top 10 cows by mass
 
 ### Visual Design
-- **Cow Appearance**: Each cow has a 🐄 emoji head and spotted body segments
-- **Colorful Cows**: Player cow is pink, bots have various colors
-- **Food Pellets**: Green/yellow dots representing grass/hay
-- **Dark Grid Background**: Classic slither.io style arena
+- **Cow Appearance**: Each cow is a circular blob with 🐄 emoji face that scales with size
+- **Cow Spots**: White spots that scale and multiply as cow grows
+- **Colorful Cows**: Player cow is pink with white outline, bots have various colors
+- **Grass Pellets**: Small green dots scattered across the field
+- **Green Grass Field**: Beautiful gradient background with grid
+- **Dynamic Sizing**: Cow emoji and name scale based on cow size
 - **Smooth Animations**: 60 FPS game loop with smooth movement
 
 ### UI/UX
