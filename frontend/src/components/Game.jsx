@@ -567,7 +567,7 @@ const Game = () => {
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="text-center">
             <h1 className="text-6xl font-bold text-white mb-2">🐮 Cow.io</h1>
-            <p className="text-xl text-gray-300 mb-8">The Moo-st Epic Slither Game</p>
+            <p className="text-xl text-gray-300 mb-8">Eat Grass, Grow Big, Dominate the Farm!</p>
             <Button 
               onClick={initGame}
               size="lg"
