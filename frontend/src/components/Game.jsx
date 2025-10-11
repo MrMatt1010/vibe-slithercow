@@ -153,42 +153,70 @@ const Game = () => {
     const game = gameRef.current;
     
     game.bots.forEach(bot => {
-      // Simple AI: move towards nearest food or away from danger
-      const head = bot.getHead();
-      let targetX = head.x;
-      let targetY = head.y;
+      // AI: move towards nearest grass or away from bigger cows
+      let targetX = bot.x;
+      let targetY = bot.y;
       
-      // Find nearest food
-      let nearestFood = null;
-      let minDist = Infinity;
+      // Check for threats (bigger cows nearby)
+      let threat = null;
+      let minThreatDist = Infinity;
       
-      game.food.forEach(food => {
-        const dx = food.x - head.x;
-        const dy = food.y - head.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < minDist && dist < 300) {
-          minDist = dist;
-          nearestFood = food;
+      const allCows = [game.player, ...game.bots];
+      allCows.forEach(cow => {
+        if (cow !== bot && cow.canEat(bot)) {
+          const dx = cow.x - bot.x;
+          const dy = cow.y - bot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 200 && dist < minThreatDist) {
+            minThreatDist = dist;
+            threat = cow;
+          }
         }
       });
       
-      if (nearestFood) {
-        targetX = nearestFood.x;
-        targetY = nearestFood.y;
+      if (threat) {
+        // Run away from threat
+        const dx = bot.x - threat.x;
+        const dy = bot.y - threat.y;
+        const angle = Math.atan2(dy, dx);
+        targetX = bot.x + Math.cos(angle) * 100;
+        targetY = bot.y + Math.sin(angle) * 100;
+        bot.isBoosting = true;
       } else {
-        // Random movement
-        if (Math.random() < 0.02) {
-          bot.angle += (Math.random() - 0.5) * 0.5;
+        bot.isBoosting = false;
+        
+        // Find nearest grass
+        let nearestGrass = null;
+        let minDist = Infinity;
+        
+        game.grass.forEach(grass => {
+          const dx = grass.x - bot.x;
+          const dy = grass.y - bot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < minDist && dist < 400) {
+            minDist = dist;
+            nearestGrass = grass;
+          }
+        });
+        
+        if (nearestGrass) {
+          targetX = nearestGrass.x;
+          targetY = nearestGrass.y;
+        } else {
+          // Random movement
+          if (Math.random() < 0.02) {
+            bot.angle += (Math.random() - 0.5) * 0.5;
+          }
+          targetX = bot.x + Math.cos(bot.angle) * 100;
+          targetY = bot.y + Math.sin(bot.angle) * 100;
         }
-        targetX = head.x + Math.cos(bot.angle) * 100;
-        targetY = head.y + Math.sin(bot.angle) * 100;
       }
       
       // Keep bots in bounds
-      if (head.x < 100) targetX = head.x + 100;
-      if (head.x > CANVAS_WIDTH - 100) targetX = head.x - 100;
-      if (head.y < 100) targetY = head.y + 100;
-      if (head.y > CANVAS_HEIGHT - 100) targetY = head.y - 100;
+      if (bot.x < 100) targetX = bot.x + 100;
+      if (bot.x > CANVAS_WIDTH - 100) targetX = bot.x - 100;
+      if (bot.y < 100) targetY = bot.y + 100;
+      if (bot.y > CANVAS_HEIGHT - 100) targetY = bot.y - 100;
       
       bot.move(targetX, targetY);
     });
